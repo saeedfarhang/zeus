@@ -1,6 +1,8 @@
 from django.utils.functional import SimpleLazyObject
 from django.urls import reverse
 
+from .cafes.schema import CafeQueries
+
 from .accounts.mutations.users import CreateUser, LoginUser
 
 from .accounts.schema import AccountQueries
@@ -14,7 +16,7 @@ API_PATH = SimpleLazyObject(lambda: reverse("api"))
 
 class Query (
     AccountQueries,
-    graphene.ObjectType
+    CafeQueries,
 ):
     ...
 
@@ -25,6 +27,5 @@ class Mutation(graphene.ObjectType):
     user_signup = CreateUser.Field()
     user_login = LoginUser.Field()
 
-    ...
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

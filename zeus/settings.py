@@ -40,7 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "graphene_django",
     'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
+]
+
+INSTALLED_APPS += [
     'accounts',
+    "cafe",
+    "menu",
+    "location"
 ]
 
 MIDDLEWARE = [
