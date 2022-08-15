@@ -12,13 +12,13 @@ import graphql_jwt
 
 API_PATH = SimpleLazyObject(lambda: reverse("api"))
 
-class Queries (
+class Query (
     AccountQueries,
     graphene.ObjectType
 ):
     ...
 
-class Mutations(graphene.ObjectType):
+class Mutation(graphene.ObjectType):
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
     refresh_token = graphql_jwt.Refresh.Field()
     verify_token = graphql_jwt.Verify.Field()
@@ -27,4 +27,4 @@ class Mutations(graphene.ObjectType):
 
     ...
 
-schema = graphene.Schema(query=Queries, mutation=Mutations)
+schema = graphene.Schema(query=Query, mutation=Mutation)

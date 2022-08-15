@@ -1,6 +1,6 @@
 import graphene
-
-from accounts.models.role import User
+from graphql.error import GraphQLError
+from accounts.models import User
 
 from .types import UserType
 
@@ -11,8 +11,10 @@ class AccountQueries(graphene.ObjectType):
     @staticmethod
     def resolve_me(root, info):
         user = info.context.user
+        if user.is_authenticated:
+            return user
 
-        return user if user.is_authenticated else None
+        raise GraphQLError(message="user is not authenticated")
 
     @staticmethod
     def resolve_users(root, info):
