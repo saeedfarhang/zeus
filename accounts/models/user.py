@@ -6,6 +6,8 @@ from versatileimagefield.fields import VersatileImageField
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 
+from .role import Role
+
 
 class UserManager(BaseUserManager):
     def create_user(
@@ -25,10 +27,14 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        return self.create_user(
+        user = self.create_user(
             email, password, is_staff=True, is_superuser=True, **extra_fields
         )
-
+        role = Role.objects.get(user=user.id)
+        role.role = 'sysadmin'
+        role.save()
+        return user
+        
     def staff(self):
         return self.get_queryset().filter(is_staff=True)
 
@@ -44,7 +50,6 @@ class User (PermissionsMixin, AbstractBaseUser):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     avatar = VersatileImageField(upload_to="user-avatars", blank=True, null=True)
     jwt_token_key = models.CharField(max_length=12, default=get_random_string)
-
     USERNAME_FIELD = "email"
 
     objects = UserManager()
@@ -59,13 +64,6 @@ class User (PermissionsMixin, AbstractBaseUser):
         return self.email
 
     def has_perm(self, perm, obj=None) -> bool:
-        # This method is overridden to accept perm as BasePermissionEnum
-        # perm = perm.value if isinstance(perm, BasePermissionEnum) else perm
-
-        # Active superusers have all permissions.
-        if self.is_active and self.is_superuser and not self._effective_permissions:
-            return True
-        # return _user_has_perm(self, perm, obj)
         return True
 
     def has_perms(

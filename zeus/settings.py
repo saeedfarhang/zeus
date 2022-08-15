@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "graphene_django",
-    'accounts',
     'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -118,7 +118,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "."))
+PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
