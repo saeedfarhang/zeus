@@ -26,9 +26,18 @@ class City(AbstractBaseModel):
     latitude = models.DecimalField(max_digits=8, decimal_places=6, default=0)
     longitude = models.DecimalField(max_digits=8, decimal_places=6, default=0)
 
+    class Meta:
+        unique_together = ("fa_name", "en_name", "province")
+
 
 class Province(AbstractBaseModel):
     fa_name = models.CharField(max_length=225)
     en_name = models.CharField(max_length=225, blank=True, null=True)
     latitude = models.DecimalField(max_digits=8, decimal_places=6, default=0)
     longitude = models.DecimalField(max_digits=8, decimal_places=6, default=0)
+
+    class Meta:
+        unique_together = (
+            "fa_name",
+            "en_name",
+        )

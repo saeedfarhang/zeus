@@ -26,7 +26,7 @@ class CafeCanvasInput(graphene.InputObjectType):
 
 class CafeAdminInput(graphene.InputObjectType):
     name = graphene.String(required=True)
-    owner_id = graphene.Int(required=True)
+    owner_id = graphene.Int()
     address = AddressInput(required=True)
     smoking_free = SmokingFreeEnum(required=True)
     # cafe_canvas = CafeCanvasInput(required=True)

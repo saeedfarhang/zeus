@@ -1,13 +1,11 @@
 import graphene
 from graphql.error import GraphQLError
+from accounts.models.user import User
 from cafe.models.cafe import Cafe
 from core.mutations.model_mutation import ModelMutation
 from graph.cafes.utils import create_address
 from graph.core.types.common import CafeError
 from ..types import CafeAdminInput, CafeType
-from django.conf import settings
-
-User = settings.AUTH_USER_MODEL
 
 
 class CreateCafeAdmin(ModelMutation):
@@ -19,7 +17,7 @@ class CreateCafeAdmin(ModelMutation):
         model = Cafe
         object_type = CafeType
         error_type_class = CafeError
-        permissions = ["sysadmin"]
+        permissions = ["sysadmin", "cafe"]
         # error_type_field = "cafe_errors"
 
     @classmethod
@@ -28,13 +26,20 @@ class CreateCafeAdmin(ModelMutation):
 
         cleaned_input = cls.get_input(data)
         cafe_address = cleaned_input.get("address")
-        print(cafe_address)
         address = create_address(cafe_address)
+        cleaned_input.pop("address")
+        if info.context.user.role.role == "cafe":
+            cafe_owner = info.context.user
+        else:
+            cafe_owner = User.objects.get(id=cleaned_input["owner_id"])
+        cleaned_input.pop("owner_id")
+        instance = super().construct_instance(instance, cleaned_input)
+        instance.owner = cafe_owner
         instance.address = address
-        instance = cleaned_input
 
         # create address
-        return super().perform_mutation(root, info, **data)
+        super().save(info, instance, data)
+        return super().success_response(instance)
 
     # cafe = graphene.Field(CafeType)
 

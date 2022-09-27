@@ -1,4 +1,5 @@
 from django.db import models
+from cafe.models.cafe_map import CafeCanvas
 from constants import SmokingFreeStatus
 from core.models.abstract_base_model import AbstractBaseModel
 from django.conf import settings
@@ -27,3 +28,10 @@ class Cafe(AbstractBaseModel):
 
     def __str__(self):
         return f"{self.name} [{self.id}]"
+
+    def save(self):
+        cafe_canvas = CafeCanvas.objects.create(width=64, height=64)
+        print(cafe_canvas)
+
+        self.cafe_canvas = cafe_canvas
+        return super().save()
