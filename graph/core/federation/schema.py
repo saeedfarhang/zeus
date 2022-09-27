@@ -4,7 +4,7 @@ import graphene
 from django.conf import settings
 from graphene.utils.str_converters import to_snake_case
 from graphql import GraphQLArgument, GraphQLError, GraphQLField, GraphQLList
-from ...schema_printer import  print_schema
+from ...schema_printer import print_schema
 from .entities import federated_entities
 
 
@@ -91,7 +91,6 @@ def build_federated_schema(query=None, mutation=None, types=None, subscription=N
     return schema
 
 
-
 def resolve_entities(_, info, *, representations):
     max_representations = settings.FEDERATED_QUERY_MAX_ENTITIES
     if max_representations and len(representations) > max_representations:
@@ -130,7 +129,6 @@ def resolve_entities(_, info, *, representations):
         entities.extend(resolver(batch, info))
 
     return entities
-
 
 
 def create_service_sdl_resolver(schema):

@@ -31,15 +31,15 @@ class UserManager(BaseUserManager):
             email, password, is_staff=True, is_superuser=True, **extra_fields
         )
         role = Role.objects.get(user=user.id)
-        role.role = 'sysadmin'
+        role.role = "sysadmin"
         role.save()
         return user
-        
+
     def staff(self):
         return self.get_queryset().filter(is_staff=True)
 
 
-class User (PermissionsMixin, AbstractBaseUser):
+class User(PermissionsMixin, AbstractBaseUser):
     email = models.EmailField(unique=True, max_length=254)
     first_name = models.CharField(max_length=256, blank=True)
     last_name = models.CharField(max_length=256, blank=True)
@@ -47,6 +47,13 @@ class User (PermissionsMixin, AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     note = models.TextField(null=True, blank=True)
     date_joined = models.DateTimeField(default=timezone.now, editable=False)
+    address = models.ForeignKey(
+        "location.Address",
+        related_name="user",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     avatar = VersatileImageField(upload_to="user-avatars", blank=True, null=True)
     jwt_token_key = models.CharField(max_length=12, default=get_random_string)
@@ -68,9 +75,7 @@ class User (PermissionsMixin, AbstractBaseUser):
     def has_perm(self, perm, obj=None) -> bool:
         return True
 
-    def has_perms(
-        self, perm_list, obj=None
-    ) -> bool:
+    def has_perms(self, perm_list, obj=None) -> bool:
         # This method is overridden to accept perm as BasePermissionEnum
         # perm_list = [
         #     perm.value if isinstance(perm, BasePermissionEnum) else perm
@@ -78,6 +83,3 @@ class User (PermissionsMixin, AbstractBaseUser):
         # ]
         # return super().has_perms(perm_list, obj)
         return True
-
-
-

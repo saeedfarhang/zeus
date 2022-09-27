@@ -6,6 +6,7 @@ from ..types import UserType, UserRoleType
 from graphql_jwt.shortcuts import get_token, get_refresh_token, create_refresh_token
 from graphql import GraphQLError
 
+
 class LoginUser(graphene.Mutation):
     user = graphene.Field(UserType)
     token = graphene.String()
@@ -29,6 +30,7 @@ class LoginUser(graphene.Mutation):
         else:
             raise GraphQLError("account does not exists")
 
+
 class CreateUser(graphene.Mutation):
     user = graphene.Field(UserType)
     token = graphene.String()
@@ -40,14 +42,13 @@ class CreateUser(graphene.Mutation):
 
     def mutate(self, info, email, password):
         user = User(email=email)
-            
 
         user.set_password(password)
         try:
             user.save()
         except:
-            raise GraphQLError('this email is already exists.')
-        
+            raise GraphQLError("this email is already exists.")
+
         token = get_token(user)
         refresh_token = create_refresh_token(user)
 

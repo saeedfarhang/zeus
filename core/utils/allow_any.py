@@ -6,7 +6,7 @@ def allow_any(info, **kwargs):
     try:
         operation_name = get_operation_name(info.operation.operation).title()
         operation_type = info.schema.get_type(operation_name)
-        if hasattr(operation_type, 'fields'):
+        if hasattr(operation_type, "fields"):
 
             field = operation_type.fields.get(info.field_name)
 

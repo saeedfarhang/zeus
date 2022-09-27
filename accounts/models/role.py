@@ -5,15 +5,12 @@ from django.db.models.signals import post_save
 
 User = settings.AUTH_USER_MODEL
 
-active_roles = (
-    ("customer", "customer"),
-    ("cafe", "cafe"),
-    ("sysadmin", "sysadmin")
-)
+ACTIVE_ROLES = (("customer", "customer"), ("cafe", "cafe"), ("sysadmin", "sysadmin"))
+
 
 class Role(models.Model):
-    user = models.OneToOneField(User, related_name='role',on_delete=models.PROTECT)
-    role = models.CharField(max_length=120, choices=active_roles, default="customer")
+    user = models.OneToOneField(User, related_name="role", on_delete=models.PROTECT)
+    role = models.CharField(max_length=120, choices=ACTIVE_ROLES, default="customer")
 
     @receiver(post_save, sender=User)
     def create_user_role(sender, instance, created, **kwargs):
