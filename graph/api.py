@@ -1,12 +1,12 @@
 from django.utils.functional import SimpleLazyObject
 from django.urls import reverse
 
-from graph.cafes.mutations.cafe_map_admin import CafeCanvasCreate
+from graph.cafes.mutations.cafe_map_admin import CafeCanvasUpdate
 from graph.locations.mutations.city_admin import CreateCityAdmin
 from graph.locations.mutations.province_admin import CreateProvinceAdmin
 from graph.locations.schema import LocationQueries
 
-from .cafes.mutations.cafe_admin import CreateCafeAdmin
+from .cafes.mutations.cafe_admin import CreateCafeAdmin, UpdateCafeAdmin
 
 from .cafes.schema import CafeQueries
 
@@ -34,7 +34,8 @@ class Mutation(graphene.ObjectType):
     user_login = LoginUser.Field()
     # cafe admin
     create_cafe = CreateCafeAdmin.Field()
-    create_cafe_canvas = CafeCanvasCreate.Field()
+    update_cafe = UpdateCafeAdmin.Field()
+    update_cafe_canvas = CafeCanvasUpdate.Field()
     # location_admin
     create_province = CreateProvinceAdmin.Field()
     create_city = CreateCityAdmin.Field()

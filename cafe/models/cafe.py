@@ -13,7 +13,7 @@ class Cafe(AbstractBaseModel):
     address = models.ForeignKey(
         "location.Address",
         related_name="cafes",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
     )
@@ -26,12 +26,13 @@ class Cafe(AbstractBaseModel):
         "cafe.CafeCanvas", related_name="cafe", on_delete=models.PROTECT
     )
 
+    class Meta:
+        unique_together = ("name", "owner")
+
     def __str__(self):
         return f"{self.name} [{self.id}]"
 
     def save(self):
         cafe_canvas = CafeCanvas.objects.create(width=64, height=64)
-        print(cafe_canvas)
-
         self.cafe_canvas = cafe_canvas
         return super().save()

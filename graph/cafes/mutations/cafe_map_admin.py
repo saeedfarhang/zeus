@@ -6,8 +6,9 @@ from ..types import CafeCanvasInput, CafeCanvasType
 from ...core.types.common import CafeCanvasError
 
 
-class CafeCanvasCreate(ModelMutation):
+class CafeCanvasUpdate(ModelMutation):
     class Arguments:
+        id = graphene.ID(description="id of cafe_canvas to be updated.")
         input = CafeCanvasInput(required=True)
 
     class Meta:

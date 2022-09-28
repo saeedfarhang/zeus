@@ -5,7 +5,7 @@ from cafe.models.cafe import Cafe
 from core.mutations.model_mutation import ModelMutation
 from graph.cafes.utils import create_address
 from graph.core.types.common import CafeError
-from ..types import CafeAdminInput, CafeType
+from ..types import CafeAdminInput, CafeType, UpdateCafeAdminInput
 
 
 class CreateCafeAdmin(ModelMutation):
@@ -18,7 +18,6 @@ class CreateCafeAdmin(ModelMutation):
         object_type = CafeType
         error_type_class = CafeError
         permissions = ["sysadmin", "cafe"]
-        # error_type_field = "cafe_errors"
 
     @classmethod
     def perform_mutation(cls, root, info, **data):
@@ -41,19 +40,32 @@ class CreateCafeAdmin(ModelMutation):
         super().save(info, instance, data)
         return super().success_response(instance)
 
-    # cafe = graphene.Field(CafeType)
 
-    # class Arguments:
-    #     name = graphene.String()
-    #     address = AddressInput(required=True)
+class UpdateCafeAdmin(CreateCafeAdmin):
+    class Arguments:
+        id = graphene.ID(required=True, description="id of cafe to be updated.")
+        input = UpdateCafeAdminInput(
+            required=True, description="Fields required to update cafe"
+        )
 
-    # def mutate(parent, info, name, address):
-    #     user = info.context.user
-    #     print(user)
-    #     if not user.is_authenticated or user.role.role != "sysadmin":
-    #         raise GraphQLError("you can't preform this action")
-    #     # try:
-    #     cafe = Cafe.objects.create(name=name, owner=user)
-    #     return CreateCafeAdmin(cafe=cafe)
-    #     # except:
-    #     # raise GraphQLError("there is a prov")
+    class Meta:
+        description = ("update a cafe.",)
+        model = Cafe
+        object_type = CafeType
+        error_type_class = CafeError
+        permissions = ["sysadmin", "cafe"]
+
+    @classmethod
+    def perform_mutation(cls, root, info, **data):
+        instance = cls.get_instance(info, **data)
+        cleaned_input = cls.get_input(data)
+        cafe_address = cleaned_input.get("address")
+        address = create_address(cafe_address)
+        cleaned_input.pop("address")
+        instance = super().construct_instance(instance, cleaned_input)
+        instance.address.delete()
+        instance.address = address
+
+        # create address
+        super().save(info, instance, data)
+        return super().success_response(instance)

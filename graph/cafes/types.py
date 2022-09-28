@@ -2,7 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from cafe.models import Cafe, CafeCanvas, Point
 from graph.core.types.model import ModelObjectType
-from graph.locations.types import AddressInput
+from graph.locations.types import AddressInput, AddressType
 
 
 class SmokingFreeEnum(graphene.Enum):
@@ -19,14 +19,21 @@ class PointInput(graphene.InputObjectType):
 
 
 class CafeCanvasInput(graphene.InputObjectType):
-    height = graphene.Int()
-    width = graphene.Int()
     line_points = graphene.List(PointInput)
 
 
 class CafeAdminInput(graphene.InputObjectType):
     name = graphene.String(required=True)
-    owner_id = graphene.Int()
+    owner_id = graphene.Int(
+        description="owner_id is required when sysadmin wants to create cafe. if your authorization token own cafe role, you don't need to fill this."
+    )
+    address = AddressInput(required=True)
+    smoking_free = SmokingFreeEnum(required=True)
+    # cafe_canvas = CafeCanvasInput(required=True)
+
+
+class UpdateCafeAdminInput(graphene.InputObjectType):
+    name = graphene.String(required=True)
     address = AddressInput(required=True)
     smoking_free = SmokingFreeEnum(required=True)
     # cafe_canvas = CafeCanvasInput(required=True)
@@ -38,6 +45,8 @@ class PointType(DjangoObjectType):
 
 
 class CafeType(DjangoObjectType):
+    address = graphene.Field(AddressType)
+
     class Meta:
         model = Cafe
 

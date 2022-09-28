@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-from location.models import City, Province
+from location.models import Address, City, Province
 
 
 class AddressInput(graphene.InputObjectType):
@@ -11,6 +11,11 @@ class AddressInput(graphene.InputObjectType):
     landline_number = graphene.String(
         description="landline number start with city code"
     )
+
+
+class AddressType(DjangoObjectType):
+    class Meta:
+        model = Address
 
 
 class ProvinceInput(graphene.InputObjectType):

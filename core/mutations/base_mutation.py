@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 import graphene
 from django.core.exceptions import (
     NON_FIELD_ERRORS,
@@ -6,9 +6,10 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.db.models.fields.files import FileField
+from django.db.models import Q
 from graphene.types.mutation import MutationOptions
-
-
+from graphql.error import GraphQLError
+from graphene import ObjectType
 from core.utils import snake_to_camel_case
 from graph.core.types.common import NonNullList
 from graph.core.utils.error_codes import get_error_code_from_error
@@ -155,6 +156,52 @@ class BaseMutation(graphene.Mutation):
 
             if error.error_dict:
                 raise error
+
+    @classmethod
+    def _get_node_by_pk(
+        cls, info, graphene_type: ObjectType, pk: Union[int, str], qs=None
+    ):
+        """Attempt to resolve a node from the given internal ID.
+
+        Whether by using the provided query set object or by calling type's get_node().
+        """
+        if qs is not None:
+            lookup = Q(pk=pk)
+            return qs.filter(lookup).first()
+        get_node = getattr(graphene_type, "get_node", None)
+        if get_node:
+            return get_node(info, pk)
+        return None
+
+    @classmethod
+    def get_node_or_error(
+        cls, info, node_id, field="id", only_type=None, qs=None, code="not_found"
+    ):
+        if not node_id:
+            return None
+
+        try:
+            object_type = only_type
+            pk = node_id
+
+            # if isinstance(object_type, str):
+            #     object_type = info.schema.get_type(object_type).graphene_type
+
+            node = cls._get_node_by_pk(info, graphene_type=object_type, pk=pk, qs=qs)
+        except (AssertionError, GraphQLError) as e:
+            raise ValidationError(
+                {field: ValidationError(str(e), code="graphql_error")}
+            )
+        else:
+            if node is None:
+                raise ValidationError(
+                    {
+                        field: ValidationError(
+                            "Couldn't resolve to a node: %s" % node_id, code=code
+                        )
+                    }
+                )
+        return node
 
     @classmethod
     def construct_instance(cls, instance, cleaned_data):
