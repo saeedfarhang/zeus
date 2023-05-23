@@ -1,4 +1,5 @@
 import graphene
+from graphql import GraphQLError
 
 from core.mutations.base_mutation import BaseMutation
 from django.core.exceptions import ImproperlyConfigured
@@ -33,6 +34,7 @@ class ModelMutation(BaseMutation):
         return_field_name=None,
         object_type=None,
         _meta=None,
+        owner_field=None,
         **options,
     ):
         if not model:
@@ -52,6 +54,8 @@ class ModelMutation(BaseMutation):
         _meta.object_type = object_type
         _meta.return_field_name = return_field_name
         _meta.exclude = exclude
+        _meta.owner_field = owner_field
+
         super().__init_subclass_with_meta__(_meta=_meta, **options)
 
         model_type = cls.get_type_for_model()
@@ -63,6 +67,18 @@ class ModelMutation(BaseMutation):
         fields = {return_field_name: graphene.Field(model_type)}
 
         cls._update_mutation_arguments_and_fields(arguments=arguments, fields=fields)
+
+    @classmethod
+    def instance_owner(cls, instance):
+        return False
+
+    @classmethod
+    def check_owner(cls, info, instance):
+        if instance and info.context.user.role.role != "sysadmin":
+            if cls.instance_owner(
+                instance
+            ) and info.context.user.id != cls.instance_owner(instance):
+                raise GraphQLError("owner permission denied")
 
     @classmethod
     def get_input(cls, data):
@@ -139,7 +155,13 @@ class ModelMutation(BaseMutation):
         return cls(**{cls._meta.return_field_name: instance, "errors": []})
 
     @classmethod
+    def delete_response(cls):
+        """Return a success response."""
+        return cls(**{"errors": []})
+
+    @classmethod
     def save(cls, info, instance, cleaned_input):
+        cls.check_owner(info, instance)
         instance.save()
 
     @classmethod
@@ -168,6 +190,8 @@ class ModelMutation(BaseMutation):
             )
         else:
             instance = cls._meta.model()
+
+        cls.check_owner(info, instance)
         return instance
 
     @classmethod

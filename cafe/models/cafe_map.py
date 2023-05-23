@@ -29,3 +29,16 @@ class CafeElement(AbstractBaseModel):
         CafeCanvas, related_name="element", on_delete=models.PROTECT
     )
     point = models.ForeignKey(Point, related_name="element", on_delete=models.CASCADE)
+
+
+class CafeTable(AbstractBaseModel):
+    name = models.CharField(max_length=100)
+    width = models.IntegerField(default=8)
+    height = models.IntegerField(default=8)
+    capacity = models.PositiveIntegerField(default=2)
+    canvas = models.ForeignKey(
+        CafeCanvas, related_name="cafe_table", on_delete=models.PROTECT
+    )
+    point = models.ForeignKey(
+        Point, related_name="cafe_table", on_delete=models.CASCADE
+    )
