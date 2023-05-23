@@ -33,6 +33,7 @@ class Cafe(AbstractBaseModel):
         return f"{self.name} [{self.id}]"
 
     def save(self):
-        cafe_canvas = CafeCanvas.objects.create(width=64, height=64)
-        self.cafe_canvas = cafe_canvas
+        if self.pk is None:
+            cafe_canvas = CafeCanvas.objects.create(width=64, height=64)
+            self.cafe_canvas = cafe_canvas
         return super().save()

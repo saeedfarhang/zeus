@@ -156,3 +156,14 @@ AUTHENTICATION_BACKENDS = [
     "graphql_jwt.backends.JSONWebTokenBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
+
+VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
+    "menu": [
+        ("menu_gallery", "thumbnail__540x540"),
+        ("menu_gallery_2x", "thumbnail__1080x1080"),
+        ("menu_small", "thumbnail__60x60"),
+        ("menu_small_2x", "thumbnail__120x120"),
+        ("menu_list", "thumbnail__255x255"),
+        ("menu_list_2x", "thumbnail__510x510"),
+    ],
+}

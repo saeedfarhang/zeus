@@ -38,6 +38,13 @@ class CityInput(graphene.InputObjectType):
     longitude = graphene.Decimal()
 
 
+class CityUpdateInput(graphene.InputObjectType):
+    fa_name = graphene.String()
+    en_name = graphene.String()
+    latitude = graphene.Decimal()
+    longitude = graphene.Decimal()
+
+
 class CityType(DjangoObjectType):
     class Meta:
         model = City

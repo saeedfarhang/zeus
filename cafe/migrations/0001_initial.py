@@ -163,4 +163,44 @@ class Migration(migrations.Migration):
                 "abstract": False,
             },
         ),
+        migrations.CreateModel(
+            name="CafeTable",
+            fields=[
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now=True)),
+                ("updated_at", models.DateTimeField(auto_now_add=True)),
+                ("is_active", models.BooleanField(default=True)),
+                ("name", models.CharField(max_length=100)),
+                ("width", models.IntegerField(default=8)),
+                ("height", models.IntegerField(default=8)),
+                ("capacity", models.PositiveIntegerField(default=2)),
+                (
+                    "canvas",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="cafe_table",
+                        to="cafe.CafeCanvas",
+                    ),
+                ),
+                (
+                    "point",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="cafe_table",
+                        to="cafe.Point",
+                    ),
+                ),
+            ],
+            options={
+                "abstract": False,
+            },
+        ),
     ]
